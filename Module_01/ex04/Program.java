@@ -71,5 +71,6 @@ public class Program {
       System.out.print("    " + entry.getKey());
       k--;
     }
+    System.out.println("");
   }
 }
