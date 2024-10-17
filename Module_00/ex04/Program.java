@@ -4,73 +4,76 @@ import java.util.TreeMap;
 
 public class Program {
   public static void main(String[] args) {
-    int tmp;
-    Integer largestVal;
-    int k = 0;
-    int[] lines = new int[10];
-    int[] reps = new int[10];
+    int[] counter = new int[65536];
 
+    System.out.println("enter a String");
     Scanner inp = new Scanner(System.in);
-    System.out.print("->");
     String input = inp.nextLine();
-    Map<Character, Integer> map = new TreeMap<>();
+    String [] data = new String[input.length()];
+    int [] lbp = new int[input.length()];
+    int largest = 1;
+    int reps = 0, pans = 0;
 
-    //storing element in a map.
-    for (int i = 0; i < input.length(); i++){
-      try {
-        tmp = map.get(input.charAt(i)) + 1;
-      } catch (Exception e) {
-        tmp = 1;
+    for (char c : input.toCharArray())
+      counter[c]++;
+
+    for (char c = 0; c < 65535; c++) {
+      if (counter[c] > 0) {
+        if (counter[c] > largest)
+          largest = counter[c];
+        if (data[counter[c]] != null)
+          data[counter[c]] +=  String.valueOf(c);
+        else
+          data[counter[c]] = String.valueOf(c);
       }
-      map.put(input.charAt(i), tmp);
     }
 
-    //creating a map that sorts values based on values instead of keys (overriding the comparator)
-    TreeMap<Character, Integer> ValsSortedMap = new TreeMap<>((k1, k2) -> { 
-      int compVal = map.get(k2).compareTo(map.get(k1));
-      return compVal == 0 ? k1.compareTo(k2) : compVal;
-    });
-    //copying from the first map to the second
-    ValsSortedMap.putAll(map);
-
-    Map.Entry<Character, Integer> firstEntry = ValsSortedMap.firstEntry();
-    largestVal = firstEntry.getValue();
-
-    // calculate percentage of each char
-    // we have : biggest value, 10 #'s, and current value, to know how many #'s to print we can do:
-    // currentVal * 10 / biggestVal.
-    for (Map.Entry<Character, Integer> entry : ValsSortedMap.entrySet()) {
-      if (k == 10)
-      break;
-      lines[k] = 10 - (entry.getValue() * 10 / largestVal) + 1; //ghanji mn ba3d n9ol dyalach had 1: f 0 kanprintiw #, khsna nprintiw number of reps 9bl so zdna wahd.
-      reps[k] = entry.getValue();
-      k++;
-    }
-    while (k < 10){
-      reps[k] = -1;
-      lines[k++] = -1;
-    }
-
-    //iterating on lines:
-    for (int i = 0; i < 11; i++){
-      //iterating on columns/our array:
-      for (int j = 0; j < 10; j++){
-        if (lines[j] == 0)
-        System.out.print("    #");
-        if (lines[j] == 1)
-        System.out.print("    " + reps[j]);
-        if (lines[j] > 0)
-        lines[j]--;
-      }
+    boolean inited = false;
+    for (int j = 0; j <= 10; j++){
+      pans = 0;
       System.out.println("");
-    }
-
-    for (Map.Entry<Character, Integer> entry : ValsSortedMap.entrySet()) {
-      if (k == 0)
-      break;
-      System.out.print("    " + entry.getKey());
-      k--;
+      if (j == 1)
+        inited = true;
+      for(int i = largest; i > 0; i--) {
+        if (data[i] != null){
+          if (!inited)
+          lbp[i] = 10 - (i * 10 / largest) + 1;
+        }
+        else 
+          lbp[i] = -1;
+        //start printing 
+        if (lbp[i] == 1){
+          for (int k = 0; k < data[i].length(); k++) {
+            if (reps == 10)
+              break;
+            System.out.print(i);
+            System.out.print("  ");
+            reps++;
+          }
+        }
+        else if (lbp[i] == 0 && pans != 10){
+          for (int k = data[i].length(); k > 0; k--) {
+            System.out.print("#  ");
+            pans++;
+          }
+        }
+        if (lbp[i] > 0)
+          lbp[i]--;
+      }
     }
     System.out.println("");
-  }
+    reps = 0;
+    for(int i = largest; i > 1; i--) {
+      if(data[i] != null) {
+        char [] single = data[i].toCharArray();
+        for (int k = 0; k < single.length; k++) {
+          if (reps == 10)
+            break;
+          System.out.print(single[k]);
+          System.out.print("  ");
+          reps++;
+        }
+      }
+    }
+  } 
 }
